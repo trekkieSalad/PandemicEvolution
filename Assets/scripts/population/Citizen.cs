@@ -137,6 +137,17 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
+    #region Public Agent Methods
+
+    public void createSocialNetwork()
+    {
+        // Creamos las redes sociales
+        RelationshipFactory friendshipFactory = new FriendshipFactory(controller);
+        friendshipFactory.createNetwork(this);
+    }
+
+    #endregion
+
     #region Friendship methods
 
     public int friendsNumber

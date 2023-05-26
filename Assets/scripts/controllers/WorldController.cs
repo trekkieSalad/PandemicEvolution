@@ -15,4 +15,12 @@ public class WorldController : AbstractController
         base.Init();
         _parameters = WorldParameters.GetInstance();
     }
+
+    public void createSocialNetworks()
+    {
+        foreach (Citizen citizen in agents)
+        {
+            citizen.createSocialNetwork();
+        }
+    }
 }

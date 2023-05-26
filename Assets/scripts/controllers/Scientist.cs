@@ -34,6 +34,8 @@ public class Scientist : MonoBehaviour
 
     void Update()
     {
+        World.createSocialNetworks();
+
         this.enabled = false;
         //Destroy(gameObject);
 
