@@ -145,6 +145,56 @@ public class Citizen : AbstractAgent {
         RelationshipFactory friendshipFactory = new FriendshipFactory(controller);
         friendshipFactory.createNetwork(this);
     }
+    public void updateEvaluations(bool initialization = false)
+    {
+        needAEvaluationA = needAImportance * needASatisfactionA;
+        needBEvaluationA = needBImportance * needBSatisfactionA;
+        needAEvaluationB = needAImportance * needASatisfactionB;
+        needBEvaluationB = needBImportance * needBSatisfactionB;
+
+        double similar = 0;
+        double different = 0;
+        foreach (Relationship friendship in friendships)
+        {
+            if (friendship.sameBehavior)
+                similar++;
+            else
+                different++;
+        }
+        similar = similar / friendsNumber;
+        different = different / friendsNumber;
+
+        membershipSatisfactionA = 0;
+        membershipSatisfactionB = 0;
+
+        if (behavior.Equals(Behavior.Accept))
+        {
+            membershipSatisfactionA =
+                Utils.maxMinNormalize(similar, 0, 1, -1, 1);
+            membershipSatisfactionB =
+                Utils.maxMinNormalize(different, 0, 1, -1, 1);
+        }
+        else if (initialization)
+        {
+            membershipSatisfactionA =
+                Utils.maxMinNormalize(different, 0, 1, -1, 1);
+            membershipSatisfactionB =
+                Utils.maxMinNormalize(similar, 0, 1, -1, 1);
+        }
+        else
+        {
+            membershipSatisfactionA = different;
+            membershipSatisfactionB = similar;
+        }
+
+        membershipEvaluationA = membershipImportance * membershipSatisfactionA;
+        membershipEvaluationB = membershipImportance * membershipSatisfactionB;
+
+        satisfactionA =
+            (needAEvaluationA + membershipEvaluationA + needBEvaluationA) / 3;
+        satisfactionB =
+            (needAEvaluationB + membershipEvaluationB + needBEvaluationB) / 3;
+    }
 
     #endregion
 
