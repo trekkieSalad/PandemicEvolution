@@ -112,13 +112,92 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
-    // METHODS
+    #region Interaction Attributes
+    [Header("Interaction")]
+    [SerializeField]
+    public List<Relationship> friendships =
+        new List<Relationship>();
+    [SerializeField]
+    public List<Relationship> neighbors =
+        new List<Relationship>();
 
+    public List<Relationship> Relationships
+    {
+        get
+        {
+            List<Relationship> relationships = new List<Relationship>();
+            relationships.AddRange(neighbors);
+            relationships.AddRange(friendships);
+            return relationships;
+        }
+    }
+    public bool inquiring;
+    public bool signaling;
+    public bool randomConversation;
+
+    #endregion
+
+    #region Friendship methods
+
+    public int friendsNumber
+    {
+        get { return friendships.Count; }
+    }
+
+    public void addFriendship(Citizen friend)
+    {
+        friendships.Add(new Relationship(this, friend));
+    }
+
+    public List<Citizen> getFriends()
+    {
+        List<Citizen> friends = new List<Citizen>();
+        foreach (Relationship friendship in friendships)
+        {
+            friends.Add(friendship.receptor);
+        }
+        return friends;
+    }
+
+    public bool IsFriend(Citizen friend)
+    {
+        return getFriends().Contains(friend);
+    }
+    #endregion
+
+    #region Social Circle methods
+
+    public int neighborsNumber
+    {
+        get { return neighbors.Count; }
+    }
+
+    public void addNeighbor(Citizen neighbor)
+    {
+        neighbors.Add(new Relationship(this, neighbor));
+    }
+
+    public List<Citizen> getNeighbors()
+    {
+        List<Citizen> neighbors = new List<Citizen>();
+        foreach (Relationship neighbor in this.neighbors)
+        {
+            neighbors.Add(neighbor.receptor);
+        }
+        return neighbors;
+    }
+    #endregion
 
     #region Citizen Utils
     public int currentTick
     {
         get { return controller.currentTick; }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = UnityEngine.Color.red;
+        Gizmos.DrawWireSphere(transform.position, 10f);
     }
     #endregion
 }
