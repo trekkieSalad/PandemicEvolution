@@ -137,6 +137,107 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
+    #region Life Cycle Methods
+
+    public override void Awake()
+    {
+        AbstractController controller =
+            FindObjectOfType<AbstractController>();
+
+        // Añadimos el agente al mundo y obtenemos su cola de comportamientos
+        if (controller == null) Debug.LogError("No controller found");
+        else
+        {
+            base.Awake();
+            base.Init();
+            CreateStepper(BehaviourQueue);
+        }
+    }
+
+    private void InquireBehaviour()
+    {
+        if (dissonanceStrength > 0 &&
+            (needADilemma || needBDilemma))
+        {
+            //Debug.Log("InquireBehaviour " + this.name);
+            InquireComm();
+        }
+    }
+
+    public void BehaviourQueue()
+    {
+        inquiring = false;
+        signaling = false;
+        randomConversation = false;
+
+        InquireBehaviour();
+
+        resetComms();
+    }
+
+    #endregion
+
+    #region Communication Methods
+
+    private void InquireComm()
+    {
+        List<Relationship> sortRelationships = Relationships.
+            OrderBy(f => f.inquired).
+            ThenByDescending(f => f.sameBehavior).
+            ThenByDescending(f => f.persuasion).ToList();
+
+        Citizen inquiredFriend = sortRelationships[0].receptor;
+        inquiring = true;
+
+        // Todo esto se puede actualizar al usar diccionarios
+
+        double similarityNeedAImportanceA = needSimilarity(
+            needAEvaluationA, inquiredFriend.needAEvaluationA,
+            needAImportance, inquiredFriend.needAImportance);
+
+        double similarityNeedBImportanceA = needSimilarity(
+            needBEvaluationA, inquiredFriend.needBEvaluationA,
+            needBImportance, inquiredFriend.needBImportance);
+
+        double similarityNeedAImportanceB = needSimilarity(
+            needAEvaluationB, inquiredFriend.needAEvaluationB,
+            needAImportance, inquiredFriend.needAImportance);
+
+        double similarityNeedBImportanceB = needSimilarity(
+            needBEvaluationB, inquiredFriend.needBEvaluationB,
+            needBImportance, inquiredFriend.needBImportance);
+
+        double persuasionNeedAA =
+            sortRelationships[0].trust * similarityNeedAImportanceA;
+        double persuasionNeedBA =
+            sortRelationships[0].trust * similarityNeedBImportanceA;
+        double persuasionNeedAB =
+            sortRelationships[0].trust * similarityNeedAImportanceB;
+        double persuasionNeedBB =
+            sortRelationships[0].trust * similarityNeedBImportanceB;
+
+        needASatisfactionA = newNeedSatisfaction(needASatisfactionA,
+            persuasionNeedAA, inquiredFriend.needASatisfactionA);
+        needBSatisfactionA = newNeedSatisfaction(needBSatisfactionA,
+            persuasionNeedBA, inquiredFriend.needBSatisfactionA);
+        needASatisfactionB = newNeedSatisfaction(needASatisfactionB,
+            persuasionNeedAB, inquiredFriend.needASatisfactionB);
+        needBSatisfactionB = newNeedSatisfaction(needBSatisfactionB,
+            persuasionNeedBB, inquiredFriend.needBSatisfactionB);
+
+        updateEvaluations();
+        updateDissonances();
+        calculateBehavior();
+        updateEvaluations();
+        updateDissonances();
+
+        sortRelationships[0].persuasion = persuasionNeedAA + persuasionNeedBA +
+            persuasionNeedAB + persuasionNeedBB;
+        sortRelationships[0].inquired = true;
+    }
+
+    #endregion
+
     #region Public Agent Methods
 
     public void createSocialNetwork()
@@ -302,6 +403,38 @@ public class Citizen : AbstractAgent {
                 dimensionA < dimensionB + 0.1 * theoricalRange);
     }
 
+    private double needSimilarity(
+        double needEvaluation, double friendNeedEvaluation,
+        double needImportance, double friendNeedImportance)
+    {
+        if (needEvaluation * friendNeedEvaluation > 0)
+            return 0.4 * (1 - Math.Abs(needImportance - friendNeedImportance));
+        else
+            return 0;
+    }
+
+    private double newNeedSatisfaction(double needSatisfaction,
+        double needPersuasion, double friendNeedSatisfaction)
+    {
+        return (1 - needPersuasion) * needSatisfaction +
+            needPersuasion * friendNeedSatisfaction;
+    }
+
+    private void resetComms()
+    {
+        if (friendships.All(f => f.inquired))
+        {
+            foreach (Relationship friendship in friendships)
+                friendship.inquired = false;
+        }
+
+
+        if (friendships.All(f => f.signaled))
+        {
+            foreach (Relationship friendship in friendships)
+                friendship.signaled = false;
+        }
+    }
     #endregion
 
     #region Friendship methods
