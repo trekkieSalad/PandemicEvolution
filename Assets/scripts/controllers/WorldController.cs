@@ -23,4 +23,13 @@ public class WorldController : AbstractController
             citizen.createSocialNetwork();
         }
     }
+
+    public void createSocialCircle()
+    {
+        RelationshipFactory socialCircleFactory = new SocialCircleFactory();
+        foreach (Citizen citizen in agents.Cast<Citizen>())
+        {
+            socialCircleFactory.createNetwork(citizen);
+        }
+    }
 }
