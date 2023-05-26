@@ -15,4 +15,21 @@ public class WorldController : AbstractController
         base.Init();
         _parameters = WorldParameters.GetInstance();
     }
+
+    public void createSocialNetworks()
+    {
+        foreach (Citizen citizen in agents)
+        {
+            citizen.createSocialNetwork();
+        }
+    }
+
+    public void createSocialCircle()
+    {
+        RelationshipFactory socialCircleFactory = new SocialCircleFactory();
+        foreach (Citizen citizen in agents.Cast<Citizen>())
+        {
+            socialCircleFactory.createNetwork(citizen);
+        }
+    }
 }
