@@ -152,14 +152,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 945b8019e91b7f242a5a272de3eb2a2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSimulationPaused: 0
-  endFrame: -1
   Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 50, y: 0, z: 50}
-  CreateSimulatedCitizens: 0
+  World: {fileID: 0}
+  CreateSimulatedCitizens: 1
   Cube: {fileID: 3735430042384668054, guid: e88a9ccd042330b428a0635862b4fdee, type: 3}
-  NumberOfCitizens: 50
+  Citizens: []
 --- !u!4 &585967824
 Transform:
   m_ObjectHideFlags: 0
@@ -352,4 +351,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1115227318
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1115227320}
+  - component: {fileID: 1115227319}
+  m_Layer: 0
+  m_Name: WorldController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1115227319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115227318}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 255411b8e58d8124fa85ec60ee1e5230, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSimulationPaused: 0
+  endFrame: -1
+--- !u!4 &1115227320
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115227318}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
