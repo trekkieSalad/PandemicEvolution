@@ -179,6 +179,7 @@ public class Citizen : AbstractAgent {
 
         InquireBehaviour();
         SignalBehaviour();
+        RandomComm();
 
         resetComms();
     }
@@ -262,6 +263,27 @@ public class Citizen : AbstractAgent {
         updateEvaluations();
         updateDissonances();
 
+    }
+
+    private void RandomComm()
+    {
+        double prob = 0.05;
+
+        if (prob >= UnityEngine.Random.value)
+        {
+            Relationship relationship =
+                Relationships[UnityEngine.Random.Range(0, Relationships.Count)];
+            randomConversation = true;
+
+            updateRelationshipReceptor(relationship);
+
+            updateEvaluations();
+            updateDissonances();
+            calculateBehavior();
+            updateEvaluations();
+            updateDissonances();
+
+        }
     }
 
     private void updateRelationshipReceptor(Relationship relationship, bool signalComm = false)
