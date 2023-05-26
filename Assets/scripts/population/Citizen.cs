@@ -5,6 +5,15 @@ using System;
 using UnityEngine;
 using ABMU.Core;
 
+public enum StateColor
+{
+    Red,
+    Green,
+    Blue,
+    Yellow,
+    Grey,
+}
+
 public enum CitizenGender {    
     Male,
     Female,
@@ -87,7 +96,7 @@ public class Citizen : AbstractAgent {
 
     #region SIR Attributes
     [Header("SIR")]
-    //public StateColor color;
+    public StateColor color;
     //public SirState actualState;
     public bool quarantine;
     public bool asintomatic;
