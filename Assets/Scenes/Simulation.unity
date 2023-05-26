@@ -155,7 +155,7 @@ MonoBehaviour:
   Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 50, y: 0, z: 50}
-  World: {fileID: 0}
+  World: {fileID: 1115227319}
   CreateSimulatedCitizens: 1
   Cube: {fileID: 3735430042384668054, guid: e88a9ccd042330b428a0635862b4fdee, type: 3}
   Citizens: []
