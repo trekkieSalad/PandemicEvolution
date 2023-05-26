@@ -251,6 +251,34 @@ public class Citizen : AbstractAgent {
             needBDilemma = true;
     }
 
+    public void calculateBehavior()
+    {
+        bool random = UnityEngine.Random.value < 0.5;
+        bool fSatisfaction =
+            furtherComparisonNeeded(satisfactionA, satisfactionB, 2);
+        bool fDissonance =
+            furtherComparisonNeeded(dissonanceA, dissonanceB, 1);
+        bool fEvaluation =
+            furtherComparisonNeeded(needAEvaluationA, needAEvaluationB, 2);
+        bool satisfaction = satisfactionA > satisfactionB;
+        bool dissonance = dissonanceA < dissonanceB;
+        bool evaluation = needAEvaluationA > needAEvaluationB;
+
+        if (fSatisfaction && fDissonance && fEvaluation && random
+            || fSatisfaction && fDissonance && !fEvaluation && evaluation
+            || fSatisfaction && !fDissonance && dissonance
+            || !fSatisfaction && satisfaction)
+        {
+            behavior = Behavior.Accept;
+            this.satisfaction = satisfactionA;
+        }
+        else
+        {
+            behavior = Behavior.Reject;
+            this.satisfaction = satisfactionB;
+        }
+    }
+
     #endregion
 
     #region Private Agent Methods
@@ -265,6 +293,13 @@ public class Citizen : AbstractAgent {
             (2 * dissonant) / (dissonant + consonant) : 0;
 
         return dissonance;
+    }
+
+    private bool furtherComparisonNeeded(
+            double dimensionA, double dimensionB, double theoricalRange)
+    {
+        return (dimensionA > dimensionB - 0.1 * theoricalRange &&
+                dimensionA < dimensionB + 0.1 * theoricalRange);
     }
 
     #endregion
