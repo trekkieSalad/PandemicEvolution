@@ -164,6 +164,13 @@ public class Citizen : AbstractAgent {
         }
     }
 
+    private void SignalBehaviour()
+    {
+        if (dissonanceStrength > 0 &&
+            membershipDilemma)
+            SignalComm();
+    }
+
     public void BehaviourQueue()
     {
         inquiring = false;
@@ -171,6 +178,7 @@ public class Citizen : AbstractAgent {
         randomConversation = false;
 
         InquireBehaviour();
+        SignalBehaviour();
 
         resetComms();
     }
@@ -234,6 +242,93 @@ public class Citizen : AbstractAgent {
         sortRelationships[0].persuasion = persuasionNeedAA + persuasionNeedBA +
             persuasionNeedAB + persuasionNeedBB;
         sortRelationships[0].inquired = true;
+    }
+
+    private void SignalComm()
+    {
+        List<Relationship> sortRelationships = Relationships.
+            OrderBy(f => f.signaled).
+            ThenByDescending(f => f.sameBehavior).
+            ThenByDescending(f => f.gullibility).ToList();
+
+        Relationship relationship = sortRelationships[0];
+        signaling = true;
+
+        updateRelationshipReceptor(relationship, true);
+
+        updateEvaluations();
+        updateDissonances();
+        calculateBehavior();
+        updateEvaluations();
+        updateDissonances();
+
+    }
+
+    private void updateRelationshipReceptor(Relationship relationship, bool signalComm = false)
+    {
+
+        Citizen receptor = relationship.receptor;
+
+        double similarityNeedAImportanceA = needSimilarity(
+            needAEvaluationA, receptor.needAEvaluationA,
+            needAImportance, receptor.needAImportance);
+
+        double similarityNeedBImportanceA = needSimilarity(
+            needBEvaluationA, receptor.needBEvaluationA,
+            needBImportance, receptor.needBImportance);
+
+        double similarityNeedAImportanceB = needSimilarity(
+            needAEvaluationB, receptor.needAEvaluationB,
+            needAImportance, receptor.needAImportance);
+
+        double similarityNeedBImportanceB = needSimilarity(
+            needBEvaluationB, receptor.needBEvaluationB,
+            needBImportance, receptor.needBImportance);
+
+
+
+        List<Relationship> friendFriendships = receptor.Relationships;
+        Relationship reverseLink = null;
+        foreach (Relationship friendship in friendFriendships)
+        {
+            if (friendship.receptor == this)
+            {
+                reverseLink = friendship;
+                break;
+            }
+        }
+
+        double sigTrust = reverseLink.trust;
+        double persuasionNeedAA = sigTrust * similarityNeedAImportanceA;
+        double persuasionNeedBA = sigTrust * similarityNeedBImportanceA;
+        double persuasionNeedAB = sigTrust * similarityNeedAImportanceB;
+        double persuasionNeedBB = sigTrust * similarityNeedBImportanceB;
+
+        receptor.needASatisfactionA = newNeedSatisfaction(
+            receptor.needASatisfactionA, persuasionNeedAA,
+            needASatisfactionA);
+        receptor.needBSatisfactionA = newNeedSatisfaction(
+            receptor.needBSatisfactionA, persuasionNeedBA,
+            needBSatisfactionA);
+        receptor.needASatisfactionB = newNeedSatisfaction(
+            receptor.needASatisfactionB, persuasionNeedAB,
+            needASatisfactionB);
+        receptor.needBSatisfactionB = newNeedSatisfaction(
+            receptor.needBSatisfactionB, persuasionNeedBB,
+            needBSatisfactionB);
+
+        receptor.updateEvaluations();
+        receptor.updateDissonances();
+        receptor.calculateBehavior();
+        receptor.updateEvaluations();
+        receptor.updateDissonances();
+
+        if (signalComm)
+        {
+            relationship.gullibility = persuasionNeedAA + persuasionNeedBB;
+            relationship.signaled = true;
+        }
+
     }
 
     #endregion
