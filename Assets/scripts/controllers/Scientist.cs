@@ -37,6 +37,16 @@ public class Scientist : MonoBehaviour
         World.createSocialNetworks();
         World.createSocialCircle();
 
+        foreach (Citizen citizen in Citizens)
+        {
+            Debug.Log(citizen.name);
+            citizen.updateEvaluations(true);
+            citizen.updateDissonances();
+            citizen.calculateBehavior();
+            citizen.updateEvaluations(true);
+            citizen.updateDissonances();
+        }
+
         this.enabled = false;
         //Destroy(gameObject);
 
