@@ -196,6 +196,77 @@ public class Citizen : AbstractAgent {
             (needAEvaluationB + membershipEvaluationB + needBEvaluationB) / 3;
     }
 
+    public void updateDissonances()
+    {
+        needADilemma = false;
+        needBDilemma = false;
+        membershipDilemma = false;
+
+        List<double> evaluationsList = new List<double>()
+            {needAEvaluationA, needBEvaluationA, membershipEvaluationA};
+
+        dissonanceA = dissonanceStatus(evaluationsList);
+        double dissonanceStrengthA =
+            (dissonanceA - dissonanceTolerance) / (1 - dissonanceTolerance);
+
+        evaluationsList = new List<double>()
+            {needAEvaluationB, needBEvaluationB, membershipEvaluationB};
+
+        dissonanceB = dissonanceStatus(evaluationsList);
+        double dissonanceStrengthB =
+            (dissonanceB - dissonanceTolerance) / (1 - dissonanceTolerance);
+
+        double evaluation1;
+        double evaluation2;
+        double membershipEvaluation;
+
+        if (behavior.Equals(Behavior.Accept))
+        {
+            dissonanceStrength = Math.Max(0, dissonanceStrengthA);
+
+            evaluation1 = needAEvaluationA;
+            evaluation2 = needBEvaluationA;
+            membershipEvaluation = membershipEvaluationA;
+
+        }
+        else
+        {
+            dissonanceStrength = Math.Max(0, dissonanceStrengthB);
+
+            evaluation1 = needAEvaluationB;
+            evaluation2 = needBEvaluationB;
+            membershipEvaluation = membershipEvaluationB;
+        }
+
+        if ((evaluation1 > 0 && membershipEvaluation < 0 && evaluation2 < 0) ||
+            (evaluation1 < 0 && membershipEvaluation > 0 && evaluation2 > 0))
+            needADilemma = true;
+
+        if ((evaluation1 < 0 && membershipEvaluation > 0 && evaluation2 < 0) ||
+            (evaluation1 > 0 && membershipEvaluation < 0 && evaluation2 > 0))
+            membershipDilemma = true;
+
+        if ((evaluation1 < 0 && membershipEvaluation < 0 && evaluation2 > 0) ||
+            (evaluation1 > 0 && membershipEvaluation > 0 && evaluation2 < 0))
+            needBDilemma = true;
+    }
+
+    #endregion
+
+    #region Private Agent Methods
+
+    private double dissonanceStatus(List<double> evaluationsList)
+    {
+        double satisfying = evaluationsList.Where(i => i > 0).ToList().Sum();
+        double dissatisfying = evaluationsList.Where(i => i < 0).ToList().Sum();
+        double dissonant = Math.Min(Math.Abs(satisfying), Math.Abs(dissatisfying));
+        double consonant = Math.Max(Math.Abs(satisfying), Math.Abs(dissatisfying));
+        double dissonance = ((dissonant + consonant) != 0) ?
+            (2 * dissonant) / (dissonant + consonant) : 0;
+
+        return dissonance;
+    }
+
     #endregion
 
     #region Friendship methods
