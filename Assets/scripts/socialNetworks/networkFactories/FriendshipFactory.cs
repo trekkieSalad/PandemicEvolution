@@ -21,14 +21,14 @@ public class FriendshipFactory : RelationshipFactory
     private void setSocialNetworks(Citizen citizen)
     {
         List<Citizen> allCandidates = controller.agents.Cast<Citizen>().ToList();
-        allCandidates = allCandidates.Except(citizen.getFriends()).ToList();
+        allCandidates = allCandidates.Except(citizen.GetFriends()).ToList();
         allCandidates.Remove(citizen);
 
         List<Citizen> inAgeCandidates =
             allCandidates.Where(c => Math.Abs(c.age - citizen.age) < 5).ToList();
 
 
-        while (citizen.friendships.Count < world.numFriends &&
+        while (citizen.Friendships.Count < world.numFriends &&
             inAgeCandidates.Count > 0)
         {
             Citizen candidate =
@@ -36,10 +36,10 @@ public class FriendshipFactory : RelationshipFactory
             inAgeCandidates.Remove(candidate);
             allCandidates.Remove(candidate);
 
-            if (candidate.friendships.Count < world.numFriends)
+            if (candidate.Friendships.Count < world.numFriends)
             {
-                citizen.addFriendship(candidate);
-                candidate.addFriendship(citizen);
+                citizen.AddFriendship(candidate);
+                candidate.AddFriendship(citizen);
             }
         }
 
@@ -48,8 +48,8 @@ public class FriendshipFactory : RelationshipFactory
             Citizen candidate =
                 allCandidates[UnityEngine.Random.Range(0, allCandidates.Count)];
 
-            citizen.addFriendship(candidate);
-            candidate.addFriendship(citizen);
+            citizen.AddFriendship(candidate);
+            candidate.AddFriendship(citizen);
         }
 
     }

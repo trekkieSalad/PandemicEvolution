@@ -20,7 +20,7 @@ public class WorldController : AbstractController
     {
         foreach (Citizen citizen in agents)
         {
-            citizen.createSocialNetwork();
+            citizen.CreateSocialNetwork();
         }
     }
 

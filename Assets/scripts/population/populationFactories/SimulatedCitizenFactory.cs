@@ -158,8 +158,6 @@ public class SimulatedCitizenFactory : CitizenFactory
         citizen.localMediaOppositionTrust = UnityEngine.Random.value;
 
         // Establecemos la situacion epidemiologica del ciudadano simulado
-        citizen.color = StateColor.Green;
-        //citizen.actualState = Susceptible;
         citizen.quarantine = false;
         citizen.asintomatic = false;
 

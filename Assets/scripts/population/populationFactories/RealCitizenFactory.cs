@@ -113,8 +113,6 @@ public class RealCitizenFactory : CitizenFactory
         citizen.localMediaOppositionTrust = UnityEngine.Random.value;
 
         // SIR
-        citizen.color = StateColor.Green;
-        //citizen.actualState = new Susceptible();
         citizen.quarantine = false;
         citizen.asintomatic = false;
 

@@ -3,10 +3,10 @@ p-se;0.07
 p-se-non-essential-nodes;0.02 
 p-se-accepting-measures;0.05 
 p-se-lockdown;0.02 
-p-id;0.005 
-p-ih;0.07 
-p-hd;0.005 
-p-hicu;0.08 
+p-id;0.05 
+p-ih;0.2 
+p-hd;0.05 
+p-hicu;0.25
 p-icud;0.31 
 recovered-days;180 
 infectious-days-to-dead;10 
@@ -25,4 +25,4 @@ new-friends;2
 prob-not-essential-node;0.25 
 first-working-day;Monday 
 first-leisure-day;Saturday 
-initial-infected;8 
+initial-infected;80 

@@ -14,7 +14,7 @@ public class SocialCircleFactory : RelationshipFactory
                 Citizen candidate = collider.gameObject.GetComponent<Citizen>();
                 if ( !citizen.IsFriend(candidate))
                 {
-                    citizen.addNeighbor(candidate);
+                    citizen.AddNeighbor(candidate);
                 }
             }
         }

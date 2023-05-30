@@ -1,5 +1,7 @@
 using System;
 
+using UnityEngine;
+
 public static class Utils
 {
     public static string[] CsvRowData(string line, string delimiter)
@@ -25,7 +27,7 @@ public static class Utils
 
     public static double randomNormal(double mean, double stdDev)
     {
-        Random rand = new Random();
+        System.Random rand = new System.Random();
         double u1 = 1.0 - rand.NextDouble();
         double u2 = 1.0 - rand.NextDouble();
         double randStdNormal = 
@@ -46,10 +48,20 @@ public static class Utils
         return randNormal;
     }
 
-    public static double logNormal()
+    public static int logNormal()
     {
         double normal = randomNormal(1.621, 0.418); 
-        return Math.Round(Math.Exp(normal));
+        return (int)Math.Round(Math.Exp(normal));
+    }
+
+    public static void ChangeColor(Citizen citizen, StateColor color)
+    {
+        float r = (float)((int)color / 1000000) / 255;
+        float g = (float)(((int)color / 1000) % 1000) / 255;
+        float b = (float)((int)color % 1000) / 255;
+        Renderer renderer = citizen.GetComponent<Renderer>();
+        renderer.material.color = new Color(r,g,b);
+
     }
 
 }

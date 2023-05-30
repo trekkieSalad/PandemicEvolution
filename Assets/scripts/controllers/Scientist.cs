@@ -1,7 +1,7 @@
 using UnityEngine;
 
 using System.Collections.Generic;
-
+using System.Linq;
 
 public class Scientist : MonoBehaviour 
 {
@@ -39,12 +39,7 @@ public class Scientist : MonoBehaviour
 
         foreach (Citizen citizen in Citizens)
         {
-            Debug.Log(citizen.name);
-            citizen.updateEvaluations(true);
-            citizen.updateDissonances();
-            citizen.calculateBehavior();
-            citizen.updateEvaluations(true);
-            citizen.updateDissonances();
+            citizen.UpdateCitizen(true);
         }
 
         this.enabled = false;
@@ -63,6 +58,27 @@ public class Scientist : MonoBehaviour
         if(CreateSimulatedCitizens){
             citizenFactory =  new SimulatedCitizenFactory(Citizens);
             Citizens.AddRange(citizenFactory.createPopulation(Cube, Bounds));
+        }
+
+        SetInitialState();
+    }
+
+    private void SetInitialState()
+    {
+        List<Citizen> susceptibleCitizens = Citizens;
+        int initialInfected = WorldParameters.GetInstance().initialInfected;
+
+        for (int i = 0; i < initialInfected; i++)
+        {
+            int index = Random.Range(0, susceptibleCitizens.Count);
+            Citizen citizen = susceptibleCitizens[index];
+            citizen.actualState = new InfectedSirState(citizen);
+            susceptibleCitizens.RemoveAt(index);
+        }
+
+        foreach (Citizen citizen in susceptibleCitizens)
+        {
+            citizen.actualState = new SusceptibleSirState(citizen);
         }
 
     }
