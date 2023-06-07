@@ -6,15 +6,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 
-public enum Day{
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday,
-    Sunday
-}
 
 public enum PopulationDensity{
     Low = 1,
@@ -31,33 +22,33 @@ public class WorldParameters
     // Simulation parameters
     [Header("Simulation Variables")]
     public static double populationDensity = (double)Scientist.DensityOfAgents/100;
-    [SerializeField][ReadOnly] private double _pSe;
-    [SerializeField][ReadOnly] private double _pSeNonEssentialNodes;
-    [SerializeField][ReadOnly] private double _pSeAcceptingMeasures;
-    [SerializeField][ReadOnly] private double _pSeLockdown;
-    [SerializeField][ReadOnly] private double _pId;
-    [SerializeField][ReadOnly] private double _pIh;
-    [SerializeField][ReadOnly] private double _pHd;
-    [SerializeField][ReadOnly] private double _pHicu;
-    [SerializeField][ReadOnly] private double _pIcud;
-    [SerializeField][ReadOnly] private int _recoveredDays;
-    [SerializeField][ReadOnly] private int _infectiousDaysToDead;
-    [SerializeField][ReadOnly] private int _infectiousDaysToHospitalized;
-    [SerializeField][ReadOnly] private int _infectiousDaysToRecovered;
-    [SerializeField][ReadOnly] private int _daysToStartQuarantine;
-    [SerializeField][ReadOnly] private int _hospitalizedDaysToDead;
-    [SerializeField][ReadOnly] private int _hospitalizedDaysToIcu;
-    [SerializeField][ReadOnly] private int _hospitalizedDaysToRecovered;
-    [SerializeField][ReadOnly] private int _icuDaysToDead;
-    [SerializeField][ReadOnly] private int _icuDaysToRecovered;
-    [SerializeField][ReadOnly] private double _socialReach;
-    [SerializeField][ReadOnly] private int _numFriends;
-    [SerializeField][ReadOnly] private double _randomFriendProb;
-    [SerializeField][ReadOnly] private int _newFriends;
-    [SerializeField][ReadOnly] private double _probNotEssentialNode;
-    [SerializeField][ReadOnly] private Day _firstWorkingDay;
-    [SerializeField][ReadOnly] private Day _firstLeisureDay;
-    [SerializeField][ReadOnly] private int _initialInfected;
+    [SerializeField] private double _pSe;
+    [SerializeField] private double _pSeNonEssentialNodes;
+    [SerializeField] private double _pSeAcceptingMeasures;
+    [SerializeField] private double _pSeLockdown;
+    [SerializeField] private double _pId;
+    [SerializeField] private double _pIh;
+    [SerializeField] private double _pHd;
+    [SerializeField] private double _pHicu;
+    [SerializeField] private double _pIcud;
+    [SerializeField] private int _recoveredDays;
+    [SerializeField] private int _infectiousDaysToDead;
+    [SerializeField] private int _infectiousDaysToHospitalized;
+    [SerializeField] private int _infectiousDaysToRecovered;
+    [SerializeField] private int _daysToStartQuarantine;
+    [SerializeField] private int _hospitalizedDaysToDead;
+    [SerializeField] private int _hospitalizedDaysToIcu;
+    [SerializeField] private int _hospitalizedDaysToRecovered;
+    [SerializeField] private int _icuDaysToDead;
+    [SerializeField] private int _icuDaysToRecovered;
+    [SerializeField] private double _socialReach;
+    [SerializeField] private int _numFriends;
+    [SerializeField] private double _randomFriendProb;
+    [SerializeField] private int _newFriends;
+    [SerializeField] private double _probNotEssentialNode;
+    [SerializeField] private Day _firstWorkingDay;
+    [SerializeField] private Day _firstLeisureDay;
+    [SerializeField] private int _initialInfected;
 
     public double pSe { get => _pSe; }
     public double pSeNonEssentialNodes { get => _pSeNonEssentialNodes; }

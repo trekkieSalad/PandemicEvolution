@@ -8,7 +8,6 @@ public class DeadSirState : SirState
         Debug.Log("Dead " + _citizen.name);
         _citizen.typeOfState = TypeOfState.Dead;
         _citizen.Dead();
-        _citizen.transform.SetParent(GameObject.Find("Deads").transform);
     }
 
     protected override void CalculateNextState()

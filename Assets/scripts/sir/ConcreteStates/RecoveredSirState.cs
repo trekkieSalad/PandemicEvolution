@@ -6,7 +6,6 @@ public class RecoveredSirState : SirState
     {
         Utils.ChangeColor(citizen, StateColor.Blue);
         _citizen.typeOfState = TypeOfState.Recovered;
-        _citizen.transform.SetParent(GameObject.Find("Recovereds").transform);
     }
 
     protected override void CalculateNextState()

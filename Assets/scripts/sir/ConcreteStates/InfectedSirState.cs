@@ -6,8 +6,6 @@ public class InfectedSirState : SirState
     {
         Utils.ChangeColor(_citizen, StateColor.Red);
         _citizen.typeOfState = TypeOfState.Infected;
-
-        _citizen.transform.SetParent(GameObject.Find("Infecteds").transform);
     }
 
     protected override void CalculateNextState()

@@ -44,6 +44,7 @@ public class SimulatedCitizenFactory : CitizenFactory
                     GameObject citizenObject =
                         MonoBehaviour.Instantiate(_citizenObject);
                     citizenObject.transform.position = pos;
+                    citizenObject.transform.position += Vector3.up * 0.5f;
                     citizenObject.name = "Citizen " + counter;
 
                     Citizen citizen = citizenObject.GetComponent<Citizen>();

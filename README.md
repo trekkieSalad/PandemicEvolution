@@ -46,7 +46,22 @@
 ### **Tareas:**
 - [x] Comportamiento RandomConversation
 - [x] Debug de llamadas a los updates
-- [ ] Diagrama de flujo del MBA
-- [ ] Estados del SIR implementados
+- [x] Diagrama de flujo del MBA
+- [x] Estados del SIR implementados
 - [ ] Funcion provisional de contagio en la red social
 - [ ] Generar nuevas amistades para agentes que se quedan solos
+
+
+## Semana 9
+### **Tareas:**
+- [ ] Funcion provisional de contagio en la red social
+- [x] Generar nuevas amistades para agentes que se quedan solos
+- [ ] Movimiento de la sociedad (nodos esenciales, no esenciales y escuelas)
+- [x] Implementar dias de la semana para la logica de movimiento
+- [ ] Implementar contagio en nodos de movimiento
+- [ ] Echar un vistazo a los datos de twitter
+- [ ] Nodos críticos (opcional)
+
+
+## Paginas de interes
+- Hugging Face: https://huggingface.co/

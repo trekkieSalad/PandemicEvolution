@@ -6,7 +6,6 @@ public class HospitalizedSirState : SirState
     {
         Utils.ChangeColor(citizen, StateColor.Violet);
         _citizen.typeOfState = TypeOfState.Hospitalized;
-        _citizen.transform.SetParent(GameObject.Find("Hospitalizeds").transform);
     }
 
     protected override void CalculateNextState()

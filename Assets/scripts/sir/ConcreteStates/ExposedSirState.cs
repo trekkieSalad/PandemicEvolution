@@ -6,7 +6,6 @@ public class ExposedSirState : SirState
     {
         Utils.ChangeColor(_citizen, StateColor.Yellow);
         _citizen.typeOfState = TypeOfState.Exposed;
-        _citizen.transform.SetParent(GameObject.Find("Exposeds").transform);
     }
 
     protected override void CalculateNextState()

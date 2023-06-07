@@ -151,6 +151,43 @@ public class Citizen : AbstractAgent {
         }
     }
 
+    public void BehaviourQueue()
+    {
+        inquiring = false;
+        signaling = false;
+        randomConversation = false;
+
+        InquireBehaviour();
+        SignalBehaviour();
+        RandomComm();
+
+        ResetComms();
+
+        actualState.UpdateState();
+        AloneBehavior();
+    }
+
+    #region On Dead
+
+    public void Dead()
+    {
+        foreach (Relationship relationship in Relationships)
+        {
+            relationship.receptor.RemoveRelation(this);
+        }
+        controller.DeregisterAgent(this);
+        Destroy(GetComponent<Citizen>());
+    }
+
+    public void RemoveRelation(Citizen receptor)
+    {
+        Relationships.RemoveAll(r => r.receptor == receptor);
+    }
+
+    #endregion
+
+    #region Behaviours
+
     private void InquireBehaviour()
     {
         if (dissonanceStrength > 0 &&
@@ -168,35 +205,15 @@ public class Citizen : AbstractAgent {
             SignalComm();
     }
 
-    public void BehaviourQueue()
+    private void AloneBehavior()
     {
-        inquiring = false;
-        signaling = false;
-        randomConversation = false;
-
-        InquireBehaviour();
-        SignalBehaviour();
-        RandomComm();
-
-        ResetComms();
-
-        actualState.UpdateState();
-    }
-
-    public void Dead()
-    {
-        foreach (Relationship relationship in Relationships)
+        if (FriendsNumber == 0)
         {
-            relationship.receptor.RemoveRelation(this);
+            MakeFriends();
         }
-        controller.DeregisterAgent(this);
-        Destroy(GetComponent<Citizen>());
     }
 
-    public void RemoveRelation(Citizen receptor)
-    {
-        Relationships.RemoveAll(r => r.receptor == receptor);
-    }
+    #endregion
 
     #endregion
 
@@ -353,7 +370,7 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
-    #region Public Agent Methods
+    #region Attributes Update Methods
 
     public void CreateSocialNetwork()
     {
@@ -371,7 +388,7 @@ public class Citizen : AbstractAgent {
         UpdateDissonances();
     }
 
-    public void UpdateEvaluations(bool initialization = false)
+    private void UpdateEvaluations(bool initialization = false)
     {
         needAEvaluationA = needAImportance * needASatisfactionA;
         needBEvaluationA = needBImportance * needBSatisfactionA;
@@ -422,7 +439,7 @@ public class Citizen : AbstractAgent {
             (needAEvaluationB + membershipEvaluationB + needBEvaluationB) / 3;
     }
 
-    public void UpdateDissonances()
+    private void UpdateDissonances()
     {
         needADilemma = false;
         needBDilemma = false;
@@ -477,7 +494,7 @@ public class Citizen : AbstractAgent {
             needBDilemma = true;
     }
 
-    public void CalculateBehavior()
+    private void CalculateBehavior()
     {
         bool random = UnityEngine.Random.value < 0.5;
         bool fSatisfaction =
@@ -504,6 +521,8 @@ public class Citizen : AbstractAgent {
             this.satisfaction = satisfactionB;
         }
     }
+
+    
 
     #endregion
 
@@ -587,6 +606,12 @@ public class Citizen : AbstractAgent {
     public bool IsFriend(Citizen friend)
     {
         return GetFriends().Contains(friend);
+    }
+
+    private void MakeFriends()
+    {
+        WorldController worldController = controller as WorldController;
+        AddFriendship(worldController.GetRandomCitizen());
     }
     #endregion
 

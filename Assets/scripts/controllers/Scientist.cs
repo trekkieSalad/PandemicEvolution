@@ -16,11 +16,13 @@ public class Scientist : MonoBehaviour
 
     [SerializeField] private List<Citizen> Citizens = new List<Citizen>();
 
-    void Start(){
+    void Start()
+    {
         Debug.Log("Scientist is creating the world");
-        
-        if(Bounds == null){
-            Bounds = new Bounds(Vector3.zero, new Vector3(100f,0,100f));
+
+        if (Bounds == null)
+        {
+            Bounds = new Bounds(Vector3.zero, new Vector3(100f, 0, 100f));
         }
 
         // Creamos los ciudadanos
@@ -65,7 +67,7 @@ public class Scientist : MonoBehaviour
 
     private void SetInitialState()
     {
-        List<Citizen> susceptibleCitizens = Citizens;
+        List<Citizen> susceptibleCitizens = new List<Citizen>(Citizens);
         int initialInfected = WorldParameters.GetInstance().initialInfected;
 
         for (int i = 0; i < initialInfected; i++)

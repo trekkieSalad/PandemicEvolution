@@ -6,7 +6,6 @@ public class ICUSirState : SirState
     {
         Utils.ChangeColor(citizen, StateColor.Brown);
         _citizen.typeOfState = TypeOfState.ICU;
-        _citizen.transform.SetParent(GameObject.Find("ICUs").transform);
     }
 
     protected override void CalculateNextState()
