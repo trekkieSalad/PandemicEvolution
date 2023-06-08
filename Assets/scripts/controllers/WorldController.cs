@@ -5,11 +5,14 @@ using ABMU.Core;
 using System.Linq;
 using TMPro;
 using System.Threading;
+using System.Collections.Generic;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class WorldController : AbstractController
 {
     private WorldParameters _parameters;
     public WorldParameters parameters { get => _parameters; }
+    public List<Place> Places = new List<Place>();
     public Day day;
 
     public override void Init()
@@ -23,7 +26,9 @@ public class WorldController : AbstractController
     {
         day = (Day)(currentTick % 7);
         GameObject.Find("DayText").GetComponent<TextMeshProUGUI>().text = 
-            EnumHelper.GetDescription(day) + "\nDay " + currentTick;
+            day.ToString() + "\nDay " + currentTick;
+
+        foreach (Place place in Places) place.EmptyNode();
         //Thread.Sleep(1000);
     }
 
@@ -44,8 +49,38 @@ public class WorldController : AbstractController
         }
     }
 
+    public void SetPlacesToMove()
+    {
+        foreach (Citizen citizen in agents.Cast<Citizen>())
+        {
+            citizen.SetPlaces();
+        }
+    }
+
     public Citizen GetRandomCitizen()
     {
         return agents[Random.Range(0, agents.Count)] as Citizen;
+    }
+
+    public Place GetNearPlace(Citizen citizen, PlaceType type)
+    {
+        GameObject[] possibleNodes =
+            GameObject.FindGameObjectsWithTag(type.ToString());
+
+        GameObject nearObject = null;
+        float distanciaMasCercana = Mathf.Infinity;
+
+        foreach (GameObject objeto in possibleNodes)
+        {
+            float distancia = Vector3.Distance(objeto.transform.position, citizen.gameObject.transform.position);
+
+            if (distancia < distanciaMasCercana)
+            {
+                distanciaMasCercana = distancia;
+                nearObject = objeto;
+            }
+        }
+
+        return nearObject.GetComponent<Place>();
     }
 }

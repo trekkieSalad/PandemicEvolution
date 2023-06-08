@@ -51,17 +51,23 @@
 - [ ] Funcion provisional de contagio en la red social
 - [ ] Generar nuevas amistades para agentes que se quedan solos
 
-
 ## Semana 9
 ### **Tareas:**
-- [ ] Funcion provisional de contagio en la red social
 - [x] Generar nuevas amistades para agentes que se quedan solos
-- [ ] Movimiento de la sociedad (nodos esenciales, no esenciales y escuelas)
 - [x] Implementar dias de la semana para la logica de movimiento
+- [x] Implementación de lugares
+- [x] Implementar lógica de movimiento de la sociedad entre lugares
 - [ ] Implementar contagio en nodos de movimiento
+
+## Semana 10
+### **Tareas:**
+- [x] Meter lista de tareas en teams
+- [ ] Implementar contagio en nodos de movimiento
+- [ ] Extraer visualizacion de historico de agentes ( estados de SEIRD y HUMAT para cada agente en cada ciclo)
+
+## Extras
+
 - [ ] Echar un vistazo a los datos de twitter
 - [ ] Nodos críticos (opcional)
-
-
 ## Paginas de interes
 - Hugging Face: https://huggingface.co/

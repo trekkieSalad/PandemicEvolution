@@ -22,6 +22,7 @@ public static class Utils
         int[] result = new int[data.Length];
 
         for (int i = 0; i < data.Length; i++) result[i] = int.Parse(data[i]);
+
         return result;
     }
 
@@ -54,7 +55,7 @@ public static class Utils
         return (int)Math.Round(Math.Exp(normal));
     }
 
-    public static void ChangeColor(Citizen citizen, StateColor color)
+    public static void ChangeColor(Citizen citizen, SirStateColor color)
     {
         float r = (float)((int)color / 1000000) / 255;
         float g = (float)(((int)color / 1000) % 1000) / 255;
@@ -62,6 +63,11 @@ public static class Utils
         Renderer renderer = citizen.GetComponent<Renderer>();
         renderer.material.color = new Color(r,g,b);
 
+    }
+
+    public static bool IsLaboralDay(Day day)
+    {
+        return day != Day.Saturday && day != Day.Sunday;
     }
 
 }

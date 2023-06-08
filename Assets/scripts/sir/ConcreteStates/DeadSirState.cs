@@ -4,9 +4,9 @@ public class DeadSirState : SirState
 {
     public DeadSirState(Citizen citizen) : base(citizen)
     {
-        Utils.ChangeColor(_citizen, StateColor.Grey);
+        Utils.ChangeColor(_citizen, SirStateColor.Grey);
         Debug.Log("Dead " + _citizen.name);
-        _citizen.typeOfState = TypeOfState.Dead;
+        Type = StateType.Dead;
         _citizen.Dead();
     }
 

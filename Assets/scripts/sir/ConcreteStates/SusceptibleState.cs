@@ -5,13 +5,13 @@ public class SusceptibleSirState : SirState
 {
     public SusceptibleSirState(Citizen citizen) : base(citizen)
     {
-        Utils.ChangeColor(_citizen, StateColor.Green);
-        _citizen.typeOfState = TypeOfState.Susceptible;
+        Utils.ChangeColor(_citizen, SirStateColor.Green);
+        Type = StateType.Susceptible;
     }
 
     protected override void CalculateNextState()
     {
-        _nextState = TypeOfState.Exposed;
+        _nextState = StateType.Exposed;
         SetTimeToStateUpdate(0);
     }
 

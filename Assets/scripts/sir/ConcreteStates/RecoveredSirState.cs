@@ -4,13 +4,13 @@ public class RecoveredSirState : SirState
 {
     public RecoveredSirState(Citizen citizen) : base(citizen)
     {
-        Utils.ChangeColor(citizen, StateColor.Blue);
-        _citizen.typeOfState = TypeOfState.Recovered;
+        Utils.ChangeColor(citizen, SirStateColor.Blue);
+        Type = StateType.Recovered;
     }
 
     protected override void CalculateNextState()
     {
-        _nextState = TypeOfState.Susceptible;
+        _nextState = StateType.Susceptible;
         SetTimeToStateUpdate(_worldParameters.recoveredDays);
     }
 

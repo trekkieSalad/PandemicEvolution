@@ -4,8 +4,8 @@ public class ICUSirState : SirState
 {
     public ICUSirState(Citizen citizen) : base(citizen)
     {
-        Utils.ChangeColor(citizen, StateColor.Brown);
-        _citizen.typeOfState = TypeOfState.ICU;
+        Utils.ChangeColor(citizen, SirStateColor.Brown);
+        Type = StateType.ICU;
     }
 
     protected override void CalculateNextState()
@@ -14,19 +14,19 @@ public class ICUSirState : SirState
 
         if (probability < _worldParameters.pId)
         {
-            _nextState = TypeOfState.Dead;
+            _nextState = StateType.Dead;
             SetTimeToStateUpdate(_worldParameters.icuDaysToDead);
         }
         else
         {
-            _nextState = TypeOfState.Recovered;
+            _nextState = StateType.Recovered;
             SetTimeToStateUpdate(_worldParameters.icuDaysToRecovered);
         }
     }
 
     protected override void ChangeState()
     {
-        if (_nextState.Equals(TypeOfState.Dead))
+        if (_nextState.Equals(StateType.Dead))
             _citizen.actualState = new DeadSirState(_citizen);
         else
             _citizen.actualState = new RecoveredSirState(_citizen);

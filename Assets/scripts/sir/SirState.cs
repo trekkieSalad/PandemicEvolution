@@ -5,7 +5,7 @@ using Unity.IO.LowLevel.Unsafe;
 
 using UnityEngine;
 
-public enum TypeOfState
+public enum StateType
 {
     Susceptible,
     Exposed,
@@ -20,7 +20,8 @@ public enum TypeOfState
 public abstract class SirState
 {
     protected Citizen _citizen;
-    protected TypeOfState _nextState;
+    public StateType Type;
+    protected StateType _nextState;
     protected WorldParameters _worldParameters;
     protected int _timeToStateUpdate;
 

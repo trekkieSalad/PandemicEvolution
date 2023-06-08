@@ -4,13 +4,13 @@ public class ExposedSirState : SirState
 {
     public ExposedSirState(Citizen citizen) : base(citizen)
     {
-        Utils.ChangeColor(_citizen, StateColor.Yellow);
-        _citizen.typeOfState = TypeOfState.Exposed;
+        Utils.ChangeColor(_citizen, SirStateColor.Yellow);
+        Type = StateType.Exposed;
     }
 
     protected override void CalculateNextState()
     {
-        _nextState = TypeOfState.Infected;
+        _nextState = StateType.Infected;
         SetTimeToStateUpdate(Utils.logNormal());
     }
 
