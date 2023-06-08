@@ -227,7 +227,7 @@ public class Citizen : AbstractAgent {
         if (actualPlace != null)
         {
             actualPlace.RegisterCitizen(this);
-            CitizenMovement(actualPlace);
+            //CitizenMovement(actualPlace);
         }
     }
 
