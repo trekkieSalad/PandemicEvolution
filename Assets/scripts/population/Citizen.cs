@@ -4,20 +4,22 @@ using System;
 
 using UnityEngine;
 using ABMU.Core;
+using Random = UnityEngine.Random;
+using UnityEditor;
 
-public enum StateColor
+#region Citizen Enums
+public enum Behavior
 {
-    Red,
-    Green,
-    Blue,
-    Yellow,
-    Grey,
+    Accept,
+    Reject,
 }
 
-public enum CitizenGender {    
+public enum CitizenGender
+{
     Male,
     Female,
 }
+#endregion
 
 public enum EconomicActivity {
     Employed = 1,
@@ -30,30 +32,28 @@ public enum EconomicActivity {
 }
 
 
-public enum Behavior {
-    Accept,
-    Reject,
-}
 
+[Serializable]
 public class Citizen : AbstractAgent {
 
     // ATTRIBUTES
+    #region ATTRIBUTES
 
     #region Simulation Attributes
     [Header("Simulation")]
-    public bool simulated;
+    public bool Simulated;
 
     #endregion
 
     #region Sociodemographic Attributes
     [Header("Sociodemographic")]
-    public CitizenGender gender;
-    public int age;
-    public int family;
-    public bool ruralHouse; //preguntar si debería ser booleano
+    public CitizenGender Gender;
+    public int Age;
+    public int Family;
+    public bool RuralHouse; //preguntar si debería ser booleano
     public EconomicActivity economicActivity;
-    public bool essentialJob; //preguntar si debería ser booleano
-    public int netIncome;
+    public bool EssentialJob; //preguntar si debería ser booleano
+    public int NetIncome;
 
     #endregion
 
@@ -69,7 +69,7 @@ public class Citizen : AbstractAgent {
     public double needASatisfactionB;
     public double membershipSatisfactionA;
     public double membershipSatisfactionB;
-    
+
     public double needAEvaluationA;
     public double needBEvaluationA;
     public double needBEvaluationB;
@@ -94,46 +94,46 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
-    #region SIR Attributes
-    [Header("SIR")]
-    public StateColor color;
-    //public SirState actualState;
-    public bool quarantine;
-    public bool asintomatic;
+    #region SEIRD Attributes
+    [Header("SEIRD")]
+    public SirState ActualState;
+    public bool Asintomatic;
 
     #endregion
 
     #region Critical Nodes Attributes
     [Header("Critical Nodes")]
-    public double cityCouncilTrust;
-    public double politicalOppositionTrust;
-    public double localMediaTrust;
-    public double localMediaOppositionTrust;
+    public double CityCouncilTrust;
+    public double PoliticalOppositionTrust;
+    public double LocalMediaTrust;
+    public double LocalMediaOppositionTrust;
 
     #endregion
 
     #region Interaction Attributes
     [Header("Interaction")]
-    [SerializeField]
-    public List<Relationship> friendships =
-        new List<Relationship>();
-    [SerializeField]
-    public List<Relationship> neighbors =
-        new List<Relationship>();
-
+    public bool Inquiring;
+    public bool Signaling;
+    public bool RandomConversation;
+    public List<Relationship> Friendships = new List<Relationship>();
+    public List<Relationship> Neighborhood = new List<Relationship>();
     public List<Relationship> Relationships
     {
         get
         {
             List<Relationship> relationships = new List<Relationship>();
-            relationships.AddRange(neighbors);
-            relationships.AddRange(friendships);
+            relationships.AddRange(Neighborhood);
+            relationships.AddRange(Friendships);
             return relationships;
         }
     }
-    public bool inquiring;
-    public bool signaling;
-    public bool randomConversation;
+
+    #endregion
+
+    #region Place Attributes
+    [Header("Place")]
+    public MyDictionary<PlaceType, Place> Places = new MyDictionary<PlaceType, Place>();
+    #endregion
 
     #endregion
 
@@ -154,6 +154,113 @@ public class Citizen : AbstractAgent {
         }
     }
 
+    void Update()
+    {
+        MoveBehaviour();
+    }
+
+    public void BehaviourQueue()
+    {
+
+        Inquiring = false;
+        Signaling = false;
+        RandomConversation = false;
+
+        InquireBehaviour();
+        SignalBehaviour();
+        RandomComm();
+
+        ResetComms();
+
+        ActualState.UpdateState();
+        AloneBehavior();
+    }
+
+    #region On Move
+    private void Move()
+    {
+        WorldController controller = this.controller as WorldController;
+        bool isLaboralDay = Utils.IsLaboralDay(controller.day);
+        Place actualPlace = null;
+
+        if (!isLaboralDay)
+        {
+            if (Random.value > 0.75)
+                actualPlace = controller.GetRandomPlace(PlaceType.LeisureZone);
+            else
+                actualPlace = Places[PlaceType.LeisureZone];
+        }
+        else
+        {
+            switch (economicActivity)
+            {
+                case EconomicActivity.Employed:
+                case EconomicActivity.Executive:
+                    actualPlace = Places[PlaceType.WorkCenter];
+                    break;
+                case EconomicActivity.Freelance:
+                    if (Random.value > 0.5)
+                        actualPlace = Places[PlaceType.WorkCenter];
+                    break;
+                case EconomicActivity.Unemployed:
+                case EconomicActivity.Inactive:
+                    if (Random.value > 0.9)
+                        actualPlace = Places[PlaceType.PublicInfrastructure];
+                    else if (Random.value > 0.5)
+                        actualPlace = Places[PlaceType.MarketPlace];
+                    else
+                        actualPlace = Places[PlaceType.LeisureZone];
+                    break;
+                case EconomicActivity.CivilServant:
+                    actualPlace = Places[PlaceType.PublicInfrastructure];
+                    break;
+                case EconomicActivity.Student:
+                    actualPlace = Places[PlaceType.EducationalCenter];
+                    break;
+                default:
+                    Debug.LogError("Economic Activity not found");
+                    break;
+            }
+
+        }
+
+        if (actualPlace != null)
+        {
+            actualPlace.RegisterCitizen(this);
+            CitizenMovement(actualPlace);
+        }
+    }
+
+    private void CitizenMovement(Place destiny)
+    {
+        float speed = 100;
+        if (destiny.type == PlaceType.LeisureZone) speed = 250;
+        transform.position = Vector3.MoveTowards(transform.position, destiny.transform.position, speed * Time.deltaTime);
+    }
+
+    #endregion
+
+    #region On Dead
+
+    public void Dead()
+    {
+        foreach (Relationship relationship in Relationships)
+        {
+            relationship.receptor.RemoveRelation(this);
+        }
+        controller.DeregisterAgent(this);
+        Destroy(GetComponent<Citizen>());
+    }
+
+    public void RemoveRelation(Citizen receptor)
+    {
+        Relationships.RemoveAll(r => r.receptor == receptor);
+    }
+
+    #endregion
+
+    #region Behaviours
+
     private void InquireBehaviour()
     {
         if (dissonanceStrength > 0 &&
@@ -171,18 +278,30 @@ public class Citizen : AbstractAgent {
             SignalComm();
     }
 
-    public void BehaviourQueue()
+    private void AloneBehavior()
     {
-        inquiring = false;
-        signaling = false;
-        randomConversation = false;
-
-        InquireBehaviour();
-        SignalBehaviour();
-        RandomComm();
-
-        resetComms();
+        if (FriendsNumber == 0)
+        {
+            MakeFriends();
+        }
     }
+
+    private void MoveBehaviour()
+    {
+        List<StateType> criticalStates =
+            new List<StateType>
+            { StateType.Dead, StateType.ICU, StateType.Hospitalized };
+
+        if (criticalStates.Contains(ActualState.Type) ||
+            ActualState.Type.Equals(StateType.Infected) &&
+            behavior.Equals(Behavior.Accept) && !Asintomatic
+            )
+            return;
+        else Move();
+
+    }
+
+    #endregion
 
     #endregion
 
@@ -196,23 +315,23 @@ public class Citizen : AbstractAgent {
             ThenByDescending(f => f.persuasion).ToList();
 
         Citizen inquiredFriend = sortRelationships[0].receptor;
-        inquiring = true;
+        Inquiring = true;
 
         // Todo esto se puede actualizar al usar diccionarios
 
-        double similarityNeedAImportanceA = needSimilarity(
+        double similarityNeedAImportanceA = NeedSimilarity(
             needAEvaluationA, inquiredFriend.needAEvaluationA,
             needAImportance, inquiredFriend.needAImportance);
 
-        double similarityNeedBImportanceA = needSimilarity(
+        double similarityNeedBImportanceA = NeedSimilarity(
             needBEvaluationA, inquiredFriend.needBEvaluationA,
             needBImportance, inquiredFriend.needBImportance);
 
-        double similarityNeedAImportanceB = needSimilarity(
+        double similarityNeedAImportanceB = NeedSimilarity(
             needAEvaluationB, inquiredFriend.needAEvaluationB,
             needAImportance, inquiredFriend.needAImportance);
 
-        double similarityNeedBImportanceB = needSimilarity(
+        double similarityNeedBImportanceB = NeedSimilarity(
             needBEvaluationB, inquiredFriend.needBEvaluationB,
             needBImportance, inquiredFriend.needBImportance);
 
@@ -225,20 +344,16 @@ public class Citizen : AbstractAgent {
         double persuasionNeedBB =
             sortRelationships[0].trust * similarityNeedBImportanceB;
 
-        needASatisfactionA = newNeedSatisfaction(needASatisfactionA,
+        needASatisfactionA = NewNeedSatisfaction(needASatisfactionA,
             persuasionNeedAA, inquiredFriend.needASatisfactionA);
-        needBSatisfactionA = newNeedSatisfaction(needBSatisfactionA,
+        needBSatisfactionA = NewNeedSatisfaction(needBSatisfactionA,
             persuasionNeedBA, inquiredFriend.needBSatisfactionA);
-        needASatisfactionB = newNeedSatisfaction(needASatisfactionB,
+        needASatisfactionB = NewNeedSatisfaction(needASatisfactionB,
             persuasionNeedAB, inquiredFriend.needASatisfactionB);
-        needBSatisfactionB = newNeedSatisfaction(needBSatisfactionB,
+        needBSatisfactionB = NewNeedSatisfaction(needBSatisfactionB,
             persuasionNeedBB, inquiredFriend.needBSatisfactionB);
 
-        updateEvaluations();
-        updateDissonances();
-        calculateBehavior();
-        updateEvaluations();
-        updateDissonances();
+        UpdateCitizen();
 
         sortRelationships[0].persuasion = persuasionNeedAA + persuasionNeedBA +
             persuasionNeedAB + persuasionNeedBB;
@@ -253,15 +368,11 @@ public class Citizen : AbstractAgent {
             ThenByDescending(f => f.gullibility).ToList();
 
         Relationship relationship = sortRelationships[0];
-        signaling = true;
+        Signaling = true;
 
-        updateRelationshipReceptor(relationship, true);
+        UpdateRelationshipReceptor(relationship, true);
 
-        updateEvaluations();
-        updateDissonances();
-        calculateBehavior();
-        updateEvaluations();
-        updateDissonances();
+        UpdateCitizen();
 
     }
 
@@ -273,37 +384,33 @@ public class Citizen : AbstractAgent {
         {
             Relationship relationship =
                 Relationships[UnityEngine.Random.Range(0, Relationships.Count)];
-            randomConversation = true;
+            RandomConversation = true;
 
-            updateRelationshipReceptor(relationship);
+            UpdateRelationshipReceptor(relationship);
 
-            updateEvaluations();
-            updateDissonances();
-            calculateBehavior();
-            updateEvaluations();
-            updateDissonances();
+            UpdateCitizen();
 
         }
     }
 
-    private void updateRelationshipReceptor(Relationship relationship, bool signalComm = false)
+    private void UpdateRelationshipReceptor(Relationship relationship, bool signalComm = false)
     {
 
         Citizen receptor = relationship.receptor;
 
-        double similarityNeedAImportanceA = needSimilarity(
+        double similarityNeedAImportanceA = NeedSimilarity(
             needAEvaluationA, receptor.needAEvaluationA,
             needAImportance, receptor.needAImportance);
 
-        double similarityNeedBImportanceA = needSimilarity(
+        double similarityNeedBImportanceA = NeedSimilarity(
             needBEvaluationA, receptor.needBEvaluationA,
             needBImportance, receptor.needBImportance);
 
-        double similarityNeedAImportanceB = needSimilarity(
+        double similarityNeedAImportanceB = NeedSimilarity(
             needAEvaluationB, receptor.needAEvaluationB,
             needAImportance, receptor.needAImportance);
 
-        double similarityNeedBImportanceB = needSimilarity(
+        double similarityNeedBImportanceB = NeedSimilarity(
             needBEvaluationB, receptor.needBEvaluationB,
             needBImportance, receptor.needBImportance);
 
@@ -326,24 +433,20 @@ public class Citizen : AbstractAgent {
         double persuasionNeedAB = sigTrust * similarityNeedAImportanceB;
         double persuasionNeedBB = sigTrust * similarityNeedBImportanceB;
 
-        receptor.needASatisfactionA = newNeedSatisfaction(
+        receptor.needASatisfactionA = NewNeedSatisfaction(
             receptor.needASatisfactionA, persuasionNeedAA,
             needASatisfactionA);
-        receptor.needBSatisfactionA = newNeedSatisfaction(
+        receptor.needBSatisfactionA = NewNeedSatisfaction(
             receptor.needBSatisfactionA, persuasionNeedBA,
             needBSatisfactionA);
-        receptor.needASatisfactionB = newNeedSatisfaction(
+        receptor.needASatisfactionB = NewNeedSatisfaction(
             receptor.needASatisfactionB, persuasionNeedAB,
             needASatisfactionB);
-        receptor.needBSatisfactionB = newNeedSatisfaction(
+        receptor.needBSatisfactionB = NewNeedSatisfaction(
             receptor.needBSatisfactionB, persuasionNeedBB,
             needBSatisfactionB);
 
-        receptor.updateEvaluations();
-        receptor.updateDissonances();
-        receptor.calculateBehavior();
-        receptor.updateEvaluations();
-        receptor.updateDissonances();
+        receptor.UpdateCitizen();
 
         if (signalComm)
         {
@@ -355,15 +458,25 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
-    #region Public Agent Methods
+    #region Attributes Update Methods
 
-    public void createSocialNetwork()
+    public void CreateSocialNetwork()
     {
         // Creamos las redes sociales
         RelationshipFactory friendshipFactory = new FriendshipFactory(controller);
         friendshipFactory.createNetwork(this);
     }
-    public void updateEvaluations(bool initialization = false)
+
+    public void UpdateCitizen(bool initialization = false)
+    {
+        UpdateEvaluations(initialization);
+        UpdateDissonances();
+        CalculateBehavior();
+        UpdateEvaluations(initialization);
+        UpdateDissonances();
+    }
+
+    private void UpdateEvaluations(bool initialization = false)
     {
         needAEvaluationA = needAImportance * needASatisfactionA;
         needBEvaluationA = needBImportance * needBSatisfactionA;
@@ -372,15 +485,15 @@ public class Citizen : AbstractAgent {
 
         double similar = 0;
         double different = 0;
-        foreach (Relationship friendship in friendships)
+        foreach (Relationship friendship in Friendships)
         {
             if (friendship.sameBehavior)
                 similar++;
             else
                 different++;
         }
-        similar = similar / friendsNumber;
-        different = different / friendsNumber;
+        similar = similar / FriendsNumber;
+        different = different / FriendsNumber;
 
         membershipSatisfactionA = 0;
         membershipSatisfactionB = 0;
@@ -414,7 +527,7 @@ public class Citizen : AbstractAgent {
             (needAEvaluationB + membershipEvaluationB + needBEvaluationB) / 3;
     }
 
-    public void updateDissonances()
+    private void UpdateDissonances()
     {
         needADilemma = false;
         needBDilemma = false;
@@ -423,14 +536,14 @@ public class Citizen : AbstractAgent {
         List<double> evaluationsList = new List<double>()
             {needAEvaluationA, needBEvaluationA, membershipEvaluationA};
 
-        dissonanceA = dissonanceStatus(evaluationsList);
+        dissonanceA = DissonanceStatus(evaluationsList);
         double dissonanceStrengthA =
             (dissonanceA - dissonanceTolerance) / (1 - dissonanceTolerance);
 
         evaluationsList = new List<double>()
             {needAEvaluationB, needBEvaluationB, membershipEvaluationB};
 
-        dissonanceB = dissonanceStatus(evaluationsList);
+        dissonanceB = DissonanceStatus(evaluationsList);
         double dissonanceStrengthB =
             (dissonanceB - dissonanceTolerance) / (1 - dissonanceTolerance);
 
@@ -469,15 +582,15 @@ public class Citizen : AbstractAgent {
             needBDilemma = true;
     }
 
-    public void calculateBehavior()
+    private void CalculateBehavior()
     {
         bool random = UnityEngine.Random.value < 0.5;
         bool fSatisfaction =
-            furtherComparisonNeeded(satisfactionA, satisfactionB, 2);
+            FurtherComparisonNeeded(satisfactionA, satisfactionB, 2);
         bool fDissonance =
-            furtherComparisonNeeded(dissonanceA, dissonanceB, 1);
+            FurtherComparisonNeeded(dissonanceA, dissonanceB, 1);
         bool fEvaluation =
-            furtherComparisonNeeded(needAEvaluationA, needAEvaluationB, 2);
+            FurtherComparisonNeeded(needAEvaluationA, needAEvaluationB, 2);
         bool satisfaction = satisfactionA > satisfactionB;
         bool dissonance = dissonanceA < dissonanceB;
         bool evaluation = needAEvaluationA > needAEvaluationB;
@@ -497,11 +610,13 @@ public class Citizen : AbstractAgent {
         }
     }
 
+    
+
     #endregion
 
-    #region Private Agent Methods
+    #region Agent Utils Methods
 
-    private double dissonanceStatus(List<double> evaluationsList)
+    private double DissonanceStatus(List<double> evaluationsList)
     {
         double satisfying = evaluationsList.Where(i => i > 0).ToList().Sum();
         double dissatisfying = evaluationsList.Where(i => i < 0).ToList().Sum();
@@ -513,14 +628,14 @@ public class Citizen : AbstractAgent {
         return dissonance;
     }
 
-    private bool furtherComparisonNeeded(
+    private bool FurtherComparisonNeeded(
             double dimensionA, double dimensionB, double theoricalRange)
     {
         return (dimensionA > dimensionB - 0.1 * theoricalRange &&
                 dimensionA < dimensionB + 0.1 * theoricalRange);
     }
 
-    private double needSimilarity(
+    private double NeedSimilarity(
         double needEvaluation, double friendNeedEvaluation,
         double needImportance, double friendNeedImportance)
     {
@@ -530,25 +645,25 @@ public class Citizen : AbstractAgent {
             return 0;
     }
 
-    private double newNeedSatisfaction(double needSatisfaction,
+    private double NewNeedSatisfaction(double needSatisfaction,
         double needPersuasion, double friendNeedSatisfaction)
     {
         return (1 - needPersuasion) * needSatisfaction +
             needPersuasion * friendNeedSatisfaction;
     }
 
-    private void resetComms()
+    private void ResetComms()
     {
-        if (friendships.All(f => f.inquired))
+        if (Friendships.All(f => f.inquired))
         {
-            foreach (Relationship friendship in friendships)
+            foreach (Relationship friendship in Friendships)
                 friendship.inquired = false;
         }
 
 
-        if (friendships.All(f => f.signaled))
+        if (Friendships.All(f => f.signaled))
         {
-            foreach (Relationship friendship in friendships)
+            foreach (Relationship friendship in Friendships)
                 friendship.signaled = false;
         }
     }
@@ -556,20 +671,20 @@ public class Citizen : AbstractAgent {
 
     #region Friendship methods
 
-    public int friendsNumber
+    public int FriendsNumber
     {
-        get { return friendships.Count; }
+        get { return Friendships.Count; }
     }
 
-    public void addFriendship(Citizen friend)
+    public void AddFriendship(Citizen friend)
     {
-        friendships.Add(new Relationship(this, friend));
+        Friendships.Add(new Relationship(this, friend));
     }
 
-    public List<Citizen> getFriends()
+    public List<Citizen> GetFriends()
     {
         List<Citizen> friends = new List<Citizen>();
-        foreach (Relationship friendship in friendships)
+        foreach (Relationship friendship in Friendships)
         {
             friends.Add(friendship.receptor);
         }
@@ -578,26 +693,32 @@ public class Citizen : AbstractAgent {
 
     public bool IsFriend(Citizen friend)
     {
-        return getFriends().Contains(friend);
+        return GetFriends().Contains(friend);
+    }
+
+    private void MakeFriends()
+    {
+        WorldController worldController = controller as WorldController;
+        AddFriendship(worldController.GetRandomCitizen());
     }
     #endregion
 
     #region Social Circle methods
 
-    public int neighborsNumber
+    public int NeighborsNumber
     {
-        get { return neighbors.Count; }
+        get { return Neighborhood.Count; }
     }
 
-    public void addNeighbor(Citizen neighbor)
+    public void AddNeighbor(Citizen neighbor)
     {
-        neighbors.Add(new Relationship(this, neighbor));
+        Neighborhood.Add(new Relationship(this, neighbor));
     }
 
-    public List<Citizen> getNeighbors()
+    public List<Citizen> GetNeighbors()
     {
         List<Citizen> neighbors = new List<Citizen>();
-        foreach (Relationship neighbor in this.neighbors)
+        foreach (Relationship neighbor in this.Neighborhood)
         {
             neighbors.Add(neighbor.receptor);
         }
@@ -605,8 +726,17 @@ public class Citizen : AbstractAgent {
     }
     #endregion
 
+    #region Place methods
+
+    public void AddPlace(PlaceType type, Place place)
+    {
+        Places.Add(type, place);
+    }
+
+    #endregion
+
     #region Citizen Utils
-    public int currentTick
+    public int CurrentTick
     {
         get { return controller.currentTick; }
     }

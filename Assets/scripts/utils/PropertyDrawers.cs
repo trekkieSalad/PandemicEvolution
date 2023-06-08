@@ -1,4 +1,4 @@
-using UnityEditor;
+/*using UnityEditor;
 using UnityEngine;
 
 public class ReadOnlyAttribute : PropertyAttribute
@@ -16,4 +16,4 @@ public class ReadOnlyPropertyDrawer : PropertyDrawer
             GUI.enabled = true;
         }
 
-}
+}*/
