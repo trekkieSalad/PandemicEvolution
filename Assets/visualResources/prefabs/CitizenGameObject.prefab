@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 801198125557593296}
   - component: {fileID: -6822571295065652617}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: CitizenGameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
