@@ -55,16 +55,16 @@ public class RealCitizenFactory : CitizenFactory
 
     private void MakeRealPopulation(Citizen citizen, int[] data)
     {
-        citizen.simulated = false;
+        citizen.Simulated = false;
 
         // información sociodemografica
-        citizen.gender = (CitizenGender)data[0];
-        citizen.age = data[1];
-        citizen.family = data[2];
-        citizen.ruralHouse = data[3].Equals(1);
+        citizen.Gender = (CitizenGender)data[0];
+        citizen.Age = data[1];
+        citizen.Family = data[2];
+        citizen.RuralHouse = data[3].Equals(1);
         citizen.economicActivity = (EconomicActivity)data[4];
-        citizen.essentialJob = data[5].Equals(1);
-        citizen.netIncome = data[6];
+        citizen.EssentialJob = data[5].Equals(1);
+        citizen.NetIncome = data[6];
 
         // necesidades
         citizen.needAImportance = Utils.maxMinNormalize(
@@ -117,14 +117,13 @@ public class RealCitizenFactory : CitizenFactory
             Utils.randomNormalTruncated(0.5, 0.14, 0.0, 1.0);
 
         // confianza
-        citizen.cityCouncilTrust = UnityEngine.Random.value;
-        citizen.politicalOppositionTrust = UnityEngine.Random.value;
-        citizen.localMediaTrust = UnityEngine.Random.value;
-        citizen.localMediaOppositionTrust = UnityEngine.Random.value;
+        citizen.CityCouncilTrust = UnityEngine.Random.value;
+        citizen.PoliticalOppositionTrust = UnityEngine.Random.value;
+        citizen.LocalMediaTrust = UnityEngine.Random.value;
+        citizen.LocalMediaOppositionTrust = UnityEngine.Random.value;
 
         // SIR
-        citizen.quarantine = false;
-        citizen.asintomatic = false;
+        citizen.Asintomatic = false;
 
         // Seccion
         string[] sectionList = new string[] {"1503009003", "1503010001",

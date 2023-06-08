@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using ABMU.Core;
 using Random = UnityEngine.Random;
+using UnityEditor;
 
 #region Citizen Enums
 public enum Behavior
@@ -32,26 +33,27 @@ public enum EconomicActivity {
 
 
 
-[System.Serializable]
+[Serializable]
 public class Citizen : AbstractAgent {
 
     // ATTRIBUTES
+    #region ATTRIBUTES
 
     #region Simulation Attributes
     [Header("Simulation")]
-    public bool simulated;
+    public bool Simulated;
 
     #endregion
 
     #region Sociodemographic Attributes
     [Header("Sociodemographic")]
-    public CitizenGender gender;
-    public int age;
-    public int family;
-    public bool ruralHouse; //preguntar si debería ser booleano
+    public CitizenGender Gender;
+    public int Age;
+    public int Family;
+    public bool RuralHouse; //preguntar si debería ser booleano
     public EconomicActivity economicActivity;
-    public bool essentialJob; //preguntar si debería ser booleano
-    public int netIncome;
+    public bool EssentialJob; //preguntar si debería ser booleano
+    public int NetIncome;
 
     #endregion
 
@@ -67,7 +69,7 @@ public class Citizen : AbstractAgent {
     public double needASatisfactionB;
     public double membershipSatisfactionA;
     public double membershipSatisfactionB;
-    
+
     public double needAEvaluationA;
     public double needBEvaluationA;
     public double needBEvaluationB;
@@ -92,28 +94,27 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
-    #region SIR Attributes
-    [Header("SIR")]
-    public SirState actualState;
-    public bool quarantine;
-    public bool asintomatic;
+    #region SEIRD Attributes
+    [Header("SEIRD")]
+    public SirState ActualState;
+    public bool Asintomatic;
 
     #endregion
 
     #region Critical Nodes Attributes
     [Header("Critical Nodes")]
-    public double cityCouncilTrust;
-    public double politicalOppositionTrust;
-    public double localMediaTrust;
-    public double localMediaOppositionTrust;
+    public double CityCouncilTrust;
+    public double PoliticalOppositionTrust;
+    public double LocalMediaTrust;
+    public double LocalMediaOppositionTrust;
 
     #endregion
 
     #region Interaction Attributes
     [Header("Interaction")]
-    public bool inquiring;
-    public bool signaling;
-    public bool randomConversation;
+    public bool Inquiring;
+    public bool Signaling;
+    public bool RandomConversation;
     public List<Relationship> Friendships = new List<Relationship>();
     public List<Relationship> Neighborhood = new List<Relationship>();
     public List<Relationship> Relationships
@@ -131,7 +132,9 @@ public class Citizen : AbstractAgent {
 
     #region Place Attributes
     [Header("Place")]
-    public Dictionary<PlaceType, Place> Places = new Dictionary<PlaceType, Place>();
+    public MyDictionary<PlaceType, Place> Places = new MyDictionary<PlaceType, Place>();
+    #endregion
+
     #endregion
 
     #region Life Cycle Methods
@@ -153,15 +156,15 @@ public class Citizen : AbstractAgent {
 
     void Update()
     {
-        Move();
+        MoveBehaviour();
     }
 
     public void BehaviourQueue()
     {
 
-        inquiring = false;
-        signaling = false;
-        randomConversation = false;
+        Inquiring = false;
+        Signaling = false;
+        RandomConversation = false;
 
         InquireBehaviour();
         SignalBehaviour();
@@ -169,9 +172,73 @@ public class Citizen : AbstractAgent {
 
         ResetComms();
 
-        actualState.UpdateState();
+        ActualState.UpdateState();
         AloneBehavior();
     }
+
+    #region On Move
+    private void Move()
+    {
+        WorldController controller = this.controller as WorldController;
+        bool isLaboralDay = Utils.IsLaboralDay(controller.day);
+        Place actualPlace = null;
+
+        if (!isLaboralDay)
+        {
+            if (Random.value > 0.75)
+                actualPlace = controller.GetRandomPlace(PlaceType.LeisureZone);
+            else
+                actualPlace = Places[PlaceType.LeisureZone];
+        }
+        else
+        {
+            switch (economicActivity)
+            {
+                case EconomicActivity.Employed:
+                case EconomicActivity.Executive:
+                    actualPlace = Places[PlaceType.WorkCenter];
+                    break;
+                case EconomicActivity.Freelance:
+                    if (Random.value > 0.5)
+                        actualPlace = Places[PlaceType.WorkCenter];
+                    break;
+                case EconomicActivity.Unemployed:
+                case EconomicActivity.Inactive:
+                    if (Random.value > 0.9)
+                        actualPlace = Places[PlaceType.PublicInfrastructure];
+                    else if (Random.value > 0.5)
+                        actualPlace = Places[PlaceType.MarketPlace];
+                    else
+                        actualPlace = Places[PlaceType.LeisureZone];
+                    break;
+                case EconomicActivity.CivilServant:
+                    actualPlace = Places[PlaceType.PublicInfrastructure];
+                    break;
+                case EconomicActivity.Student:
+                    actualPlace = Places[PlaceType.EducationalCenter];
+                    break;
+                default:
+                    Debug.LogError("Economic Activity not found");
+                    break;
+            }
+
+        }
+
+        if (actualPlace != null)
+        {
+            actualPlace.RegisterCitizen(this);
+            CitizenMovement(actualPlace);
+        }
+    }
+
+    private void CitizenMovement(Place destiny)
+    {
+        float speed = 100;
+        if (destiny.type == PlaceType.LeisureZone) speed = 250;
+        transform.position = Vector3.MoveTowards(transform.position, destiny.transform.position, speed * Time.deltaTime);
+    }
+
+    #endregion
 
     #region On Dead
 
@@ -219,72 +286,22 @@ public class Citizen : AbstractAgent {
         }
     }
 
-    #endregion
-
     private void MoveBehaviour()
     {
-        List<StateType> criticalStates = 
-            new List<StateType> 
+        List<StateType> criticalStates =
+            new List<StateType>
             { StateType.Dead, StateType.ICU, StateType.Hospitalized };
 
-        if (criticalStates.Contains(actualState.Type) ||
-            actualState.Type.Equals(StateType.Infected) && 
-            behavior.Equals(Behavior.Accept) && !asintomatic
+        if (criticalStates.Contains(ActualState.Type) ||
+            ActualState.Type.Equals(StateType.Infected) &&
+            behavior.Equals(Behavior.Accept) && !Asintomatic
             )
             return;
         else Move();
 
     }
 
-    private void Move()
-    {
-        WorldController controller = this.controller as WorldController;
-        bool isLaboralDay = Utils.IsLaboralDay(controller.day);
-
-        switch (economicActivity)
-        {
-            case EconomicActivity.Employed:
-            case EconomicActivity.Executive:
-                if (isLaboralDay) 
-                    Places[PlaceType.WorkCenter].RegisterCitizen(this);
-                else Places[PlaceType.LeisureZone].RegisterCitizen(this);
-                break;
-            case EconomicActivity.Freelance:
-                if (isLaboralDay) 
-                    if (Random.value > 0.5)
-                        Places[PlaceType.WorkCenter].RegisterCitizen(this);
-                    else Places[PlaceType.LeisureZone].RegisterCitizen(this);
-                break;
-            case EconomicActivity.Unemployed:
-            case EconomicActivity.Inactive:
-                if (isLaboralDay && Random.value > 0.25)
-                    Places[PlaceType.MarketPlace].RegisterCitizen(this);
-                else Places[PlaceType.LeisureZone].RegisterCitizen(this);
-                break;
-            case EconomicActivity.CivilServant:
-                if (isLaboralDay) 
-                    Places[PlaceType.PublicInfrastructure].RegisterCitizen(this);
-                else Places[PlaceType.LeisureZone].RegisterCitizen(this);
-                break;
-            case EconomicActivity.Student:
-                if (isLaboralDay) 
-                    Places[PlaceType.EducationalCenter].RegisterCitizen(this);
-                else Places[PlaceType.LeisureZone].RegisterCitizen(this);
-                break;
-            default:
-                Debug.LogError("Economic Activity not found");
-                break;
-        }
-    }
-
-    public void SetPlaces()
-    {
-        WorldController controller = this.controller as WorldController;
-        foreach (PlaceType type in Enum.GetValues(typeof(PlaceType)))
-        {
-            Places.Add(type, controller.GetNearPlace(this, type));
-        }
-    }
+    #endregion
 
     #endregion
 
@@ -298,7 +315,7 @@ public class Citizen : AbstractAgent {
             ThenByDescending(f => f.persuasion).ToList();
 
         Citizen inquiredFriend = sortRelationships[0].receptor;
-        inquiring = true;
+        Inquiring = true;
 
         // Todo esto se puede actualizar al usar diccionarios
 
@@ -351,7 +368,7 @@ public class Citizen : AbstractAgent {
             ThenByDescending(f => f.gullibility).ToList();
 
         Relationship relationship = sortRelationships[0];
-        signaling = true;
+        Signaling = true;
 
         UpdateRelationshipReceptor(relationship, true);
 
@@ -367,7 +384,7 @@ public class Citizen : AbstractAgent {
         {
             Relationship relationship =
                 Relationships[UnityEngine.Random.Range(0, Relationships.Count)];
-            randomConversation = true;
+            RandomConversation = true;
 
             UpdateRelationshipReceptor(relationship);
 
@@ -597,7 +614,7 @@ public class Citizen : AbstractAgent {
 
     #endregion
 
-    #region Private Agent Methods
+    #region Agent Utils Methods
 
     private double DissonanceStatus(List<double> evaluationsList)
     {
@@ -707,6 +724,15 @@ public class Citizen : AbstractAgent {
         }
         return neighbors;
     }
+    #endregion
+
+    #region Place methods
+
+    public void AddPlace(PlaceType type, Place place)
+    {
+        Places.Add(type, place);
+    }
+
     #endregion
 
     #region Citizen Utils

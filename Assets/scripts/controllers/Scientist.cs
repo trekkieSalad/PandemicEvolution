@@ -85,13 +85,13 @@ public class Scientist : MonoBehaviour
         {
             int index = Random.Range(0, susceptibleCitizens.Count);
             Citizen citizen = susceptibleCitizens[index];
-            citizen.actualState = new InfectedSirState(citizen);
+            citizen.ActualState = new InfectedSirState(citizen);
             susceptibleCitizens.RemoveAt(index);
         }
 
         foreach (Citizen citizen in susceptibleCitizens)
         {
-            citizen.actualState = new SusceptibleSirState(citizen);
+            citizen.ActualState = new SusceptibleSirState(citizen);
         }
 
     }

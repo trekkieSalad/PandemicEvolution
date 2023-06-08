@@ -25,7 +25,7 @@ public class FriendshipFactory : RelationshipFactory
         allCandidates.Remove(citizen);
 
         List<Citizen> inAgeCandidates =
-            allCandidates.Where(c => Math.Abs(c.age - citizen.age) < 5).ToList();
+            allCandidates.Where(c => Math.Abs(c.Age - citizen.Age) < 5).ToList();
 
 
         while (citizen.Friendships.Count < world.numFriends &&

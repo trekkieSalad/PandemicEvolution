@@ -17,6 +17,6 @@ public class SusceptibleSirState : SirState
 
     protected override void ChangeState()
     {
-        _citizen.actualState = new ExposedSirState(_citizen);
+        _citizen.ActualState = new ExposedSirState(_citizen);
     }
 }

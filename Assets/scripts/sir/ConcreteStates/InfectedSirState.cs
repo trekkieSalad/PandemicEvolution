@@ -32,10 +32,10 @@ public class InfectedSirState : SirState
     protected override void ChangeState()
     {
         if (_nextState.Equals(StateType.Dead))
-            _citizen.actualState = new DeadSirState(_citizen);
+            _citizen.ActualState = new DeadSirState(_citizen);
         else if (_nextState.Equals(StateType.Hospitalized))
-            _citizen.actualState = new HospitalizedSirState(_citizen);
+            _citizen.ActualState = new HospitalizedSirState(_citizen);
         else
-            _citizen.actualState = new RecoveredSirState(_citizen);
+            _citizen.ActualState = new RecoveredSirState(_citizen);
     }
 }

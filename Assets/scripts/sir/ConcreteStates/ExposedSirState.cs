@@ -16,7 +16,7 @@ public class ExposedSirState : SirState
 
     protected override void ChangeState()
     {
-        _citizen.actualState = new InfectedSirState(_citizen);
-        _citizen.asintomatic = Random.value < 0.4;
+        _citizen.ActualState = new InfectedSirState(_citizen);
+        _citizen.Asintomatic = Random.value < 0.4;
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using TMPro;
 using System.Threading;
 using System.Collections.Generic;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
+
 
 public class WorldController : AbstractController
 {
@@ -53,7 +53,10 @@ public class WorldController : AbstractController
     {
         foreach (Citizen citizen in agents.Cast<Citizen>())
         {
-            citizen.SetPlaces();
+            foreach (PlaceType type in System.Enum.GetValues(typeof(PlaceType)))
+            {
+                citizen.AddPlace(type, GetNearPlace(citizen, type));
+            }
         }
     }
 
@@ -82,5 +85,11 @@ public class WorldController : AbstractController
         }
 
         return nearObject.GetComponent<Place>();
+    }
+
+    public Place GetRandomPlace(PlaceType type)
+    {
+        List<Place> places = Places.Where(p => p.type == type).ToList();
+        return places[Random.Range(0, places.Count)];
     }
 }

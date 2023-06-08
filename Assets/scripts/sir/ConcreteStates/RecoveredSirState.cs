@@ -16,6 +16,6 @@ public class RecoveredSirState : SirState
 
     protected override void ChangeState()
     {
-        _citizen.actualState = new SusceptibleSirState(_citizen);
+        _citizen.ActualState = new SusceptibleSirState(_citizen);
     }
 }

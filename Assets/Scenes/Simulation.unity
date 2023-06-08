@@ -291,7 +291,7 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 200, y: 0, z: 200}
   World: {fileID: 1115227319}
-  CreateSimulatedCitizens: 0
+  CreateSimulatedCitizens: 1
   CitizenObject: {fileID: 3735430042384668054, guid: e88a9ccd042330b428a0635862b4fdee, type: 3}
   NodeObject: {fileID: 7365727065260092413, guid: 64bd78cfe4c993c44aeb9d1061ca42c7, type: 3}
   Citizens: []
@@ -689,7 +689,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSimulationPaused: 0
   endFrame: -1
-  Places: []
+  Places:
+  - {fileID: 0}
   day: 0
 --- !u!4 &1115227320
 Transform:

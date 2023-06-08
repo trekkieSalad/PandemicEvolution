@@ -15,7 +15,7 @@ public class PlaceFactory
 
         foreach (PlaceType type in Enum.GetValues(typeof(PlaceType)))
         {
-            int number = type.GetCapacity();
+            int number = type.GetQuantity();
 
             for (int i = 0; i < number; i++)
             {

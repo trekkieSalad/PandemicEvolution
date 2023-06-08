@@ -27,8 +27,8 @@ public class ICUSirState : SirState
     protected override void ChangeState()
     {
         if (_nextState.Equals(StateType.Dead))
-            _citizen.actualState = new DeadSirState(_citizen);
+            _citizen.ActualState = new DeadSirState(_citizen);
         else
-            _citizen.actualState = new RecoveredSirState(_citizen);
+            _citizen.ActualState = new RecoveredSirState(_citizen);
     }
 }

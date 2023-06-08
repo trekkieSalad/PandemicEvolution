@@ -111,21 +111,21 @@ public class SimulatedCitizenFactory : CitizenFactory
             };
 
         // Establecemos los atributos del ciudadano en función de su edad y sexo
-        citizen.simulated = true;
+        citizen.Simulated = true;
         citizen.section = section;
-        citizen.age = old ?
+        citizen.Age = old ?
             UnityEngine.Random.Range(65, 101) :
             UnityEngine.Random.Range(18, 65);
-        citizen.gender = gender;
+        citizen.Gender = gender;
 
-        citizen.family =
+        citizen.Family =
             (UnityEngine.Random.value <= famProb[gender][old ? 1 : 0]) ? 4 : 1;
-        citizen.netIncome =
+        citizen.NetIncome =
             (UnityEngine.Random.value <= netProb[gender][old ? 1 : 0]) ? 3 : 1;
-        citizen.ruralHouse =
+        citizen.RuralHouse =
             (UnityEngine.Random.value <= rurProb[gender][old ? 1 : 0]) ?
             true : false;
-        citizen.essentialJob =
+        citizen.EssentialJob =
             (UnityEngine.Random.value <= netProb[gender][old ? 1 : 0]) ?
             true : false;
         citizen.economicActivity =
@@ -161,75 +161,74 @@ public class SimulatedCitizenFactory : CitizenFactory
             Behavior.Accept : Behavior.Reject;
 
         // Establecemos el nivel de confianza del ciudadano simulado
-        citizen.cityCouncilTrust = UnityEngine.Random.value;
-        citizen.politicalOppositionTrust = UnityEngine.Random.value;
-        citizen.localMediaTrust = UnityEngine.Random.value;
-        citizen.localMediaOppositionTrust = UnityEngine.Random.value;
+        citizen.CityCouncilTrust = UnityEngine.Random.value;
+        citizen.PoliticalOppositionTrust = UnityEngine.Random.value;
+        citizen.LocalMediaTrust = UnityEngine.Random.value;
+        citizen.LocalMediaOppositionTrust = UnityEngine.Random.value;
 
         // Establecemos la situacion epidemiologica del ciudadano simulado
-        citizen.quarantine = false;
-        citizen.asintomatic = false;
+        citizen.Asintomatic = false;
 
     }
 
     private Citizen getCitizenToCopy(Citizen citizen)
     {
         List<Citizen> filterRealCitizens = realCitizens;
-        if (citizen.age >= 45)
+        if (citizen.Age >= 45)
         {
             filterRealCitizens = 
-                filterRealCitizens.Where(a => a.age >= 45).ToList();
+                filterRealCitizens.Where(a => a.Age >= 45).ToList();
         }
-        else if (citizen.age >= 25)
+        else if (citizen.Age >= 25)
         {
-            if (citizen.ruralHouse)
+            if (citizen.RuralHouse)
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        a.ruralHouse &&
-                        25 <= a.age &&
-                        a.age < 45
+                        a.RuralHouse &&
+                        25 <= a.Age &&
+                        a.Age < 45
                     ).ToList();
-            else if (citizen.essentialJob)
+            else if (citizen.EssentialJob)
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        !a.ruralHouse &&
-                        a.essentialJob &&
-                        25 <= a.age &&
-                        a.age < 45
+                        !a.RuralHouse &&
+                        a.EssentialJob &&
+                        25 <= a.Age &&
+                        a.Age < 45
                     ).ToList();
             else if (citizen.economicActivity.Equals(EconomicActivity.Employed))
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        !a.ruralHouse &&
-                        !a.essentialJob &&
-                        25 <= a.age &&
-                        a.age < 45 &&
+                        !a.RuralHouse &&
+                        !a.EssentialJob &&
+                        25 <= a.Age &&
+                        a.Age < 45 &&
                         a.economicActivity.Equals(EconomicActivity.Employed)
                     ).ToList();
             else
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        !a.ruralHouse &&
-                        !a.essentialJob &&
-                        25 <= a.age &&
-                        a.age < 45 &&
+                        !a.RuralHouse &&
+                        !a.EssentialJob &&
+                        25 <= a.Age &&
+                        a.Age < 45 &&
                         !a.economicActivity.Equals(EconomicActivity.Employed)
                     ).ToList();
         }
         else
         {
-            if (citizen.family < 3)
+            if (citizen.Family < 3)
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        a.age < 25 &&
-                        a.family < 3
+                        a.Age < 25 &&
+                        a.Family < 3
                     ).ToList();
-            else if (citizen.netIncome > 2)
+            else if (citizen.NetIncome > 2)
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        a.netIncome > 2 &&
-                        a.age < 25 &&
-                        a.family > 2
+                        a.NetIncome > 2 &&
+                        a.Age < 25 &&
+                        a.Family > 2
                     ).ToList();
             else
                 filterRealCitizens = filterRealCitizens.Where(a =>
-                        a.netIncome < 3 &&
-                        a.age < 25 &&
-                        a.family > 2
+                        a.NetIncome < 3 &&
+                        a.Age < 25 &&
+                        a.Family > 2
                     ).ToList();
         }
 
