@@ -23,12 +23,19 @@ public class SimulatedCitizenFactory : CitizenFactory
         bool citizenLimit = numCitizens != -1;
         int counter = realCitizens.Count;
 
-        StreamReader file = new StreamReader(PathManager.SIMULATED_POPULATION);
-        string[] data = Utils.CsvRowData(file.ReadLine(), ";");
-        while (!file.EndOfStream)
+        TextAsset textAsset = Resources.Load<TextAsset>("CensusCoruña");
+
+        string[] lines = textAsset.text.Split('\n');
+        lines = lines.Skip(1).ToArray();
+
+        string[] data;
+
+        foreach (string line in lines)
         {
+            if (line.Equals("") || line.Equals("\r")) continue;
             double reductionFactor = WorldParameters.populationDensity;
-            data = Utils.CsvRowData(file.ReadLine(), ";");
+            string finalLine = line.Replace("\r", "");
+            data = Utils.CsvRowData(finalLine, ";");
 
 
             string section = data[0];
@@ -46,6 +53,7 @@ public class SimulatedCitizenFactory : CitizenFactory
                     citizenObject.transform.position = pos;
                     citizenObject.transform.position += Vector3.up * 0.5f;
                     citizenObject.name = "Citizen " + counter;
+                    citizenObject.tag = "Citizen";
 
                     Citizen citizen = citizenObject.GetComponent<Citizen>();
                     MakeSimulatedPopulation(citizen, section, old, gender);
@@ -59,8 +67,8 @@ public class SimulatedCitizenFactory : CitizenFactory
                 numCitizens--;
                 if (numCitizens == 0) break;
             }
+
         }
-        file.Close();
         Debug.Log("Simulated population created: " + counter + " citizens");
         return citizens;
     }

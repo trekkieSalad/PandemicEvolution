@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine;
+using System.Linq;
 
 public class RealCitizenFactory : CitizenFactory
 {
@@ -14,20 +15,26 @@ public class RealCitizenFactory : CitizenFactory
         bool citizenLimit = numCitizens != -1;
         int counter = 0;
 
-        StreamReader file = new StreamReader(PathManager.REAL_POPULATION);
-        string[] data = Utils.CsvRowData(file.ReadLine(), ";");
-        while (!file.EndOfStream)
+        TextAsset textAsset = Resources.Load<TextAsset>("RealPopulation");
+        
+        string[] lines = textAsset.text.Split('\n');
+        lines = lines.Skip(1).ToArray();
+
+        string[] data;
+
+        foreach (string line in lines)
         {
+            if (line.Equals("") || line.Equals("\r")) continue;
             Vector3 pos = Utilities.RandomPointInBounds(bounds);
             GameObject citizenObject =
                 MonoBehaviour.Instantiate(_citizenObject);
-            citizenObject.transform.position = pos;
-            // elevamos la posicion para que no se hundan en el terreno
-            citizenObject.transform.position += Vector3.up * 0.5f;
+            citizenObject.transform.position = pos + Vector3.up * 0.5f;
             citizenObject.name = "Citizen " + counter;
+            citizenObject.tag = "Citizen";
 
             Citizen citizen = citizenObject.GetComponent<Citizen>();
-            data = Utils.CsvRowData(file.ReadLine(), ";");
+            string finalLine = line.Replace("\r", "");
+            data = Utils.CsvRowData(finalLine, ";");
 
             MakeRealPopulation(citizen, Utils.stringArrayToInt(data));
             citizens.Add(citizen);
@@ -38,8 +45,9 @@ public class RealCitizenFactory : CitizenFactory
                 numCitizens--;
                 if (numCitizens == 0) break;
             }
+
         }
-        file.Close();
+
         Debug.Log("Real population created: " + counter + " citizens");
 
         return citizens;

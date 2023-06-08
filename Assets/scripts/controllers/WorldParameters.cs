@@ -5,7 +5,7 @@ using Unity.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
-
+using System.Linq;
 
 public enum PopulationDensity{
     Low = 1,
@@ -92,14 +92,21 @@ public class WorldParameters
     
     private void initParameters(){
         Dictionary<string, object> parameters = new Dictionary<string, object>();
-        StreamReader file = new StreamReader(PathManager.WORLD_PARAMETERS);
-        string[] data = Utils.CsvRowData(file.ReadLine(), ";");
-        while (!file.EndOfStream)
+
+
+        TextAsset textAsset = Resources.Load<TextAsset>("WorldParams");
+
+        string[] lines = textAsset.text.Split('\n');
+        lines = lines.Skip(1).ToArray();
+
+        string[] data;
+        foreach (string line in lines)
         {
-            data = Utils.CsvRowData(file.ReadLine(), ";");
-            parameters.Add(data[0], data[1]);            
+            if (line.Equals("") || line.Equals("\r")) continue;
+            string finalLine = line.Replace("\r", "");
+            data = Utils.CsvRowData(finalLine, ";");
+            parameters.Add(data[0], data[1]);
         }
-        file.Close();
 
         _pSe = double.Parse(
             parameters["p-se"].ToString(), CultureInfo.InvariantCulture);
